@@ -199,6 +199,30 @@ $if !ui2_custom_rendering ? {
 		}
 	}
 
+	fn window_ready_test_handler(handle voidptr) {
+		// Report through the menu state so the test needs no globals.
+		menu_update_window(handle)
+	}
+
+	fn test_windows_window_ready_hook_fires_with_main_hwnd() {
+		previous_window := menu_window()
+		previous_handler := windows_state().window_ready_handler
+		on_window_ready(window_ready_test_handler)
+		mut st := windows_state()
+		previous_root := st.root
+		fake := voidptr(usize(0x5678))
+		st.root = fake
+		windows_fire_window_ready()
+		assert native_window_handle() == fake
+		// Without a handler firing is a silent no-op.
+		on_window_ready(WindowReadyFn(unsafe { nil }))
+		menu_update_window(previous_window)
+		windows_fire_window_ready()
+		assert native_window_handle() == previous_window
+		st.root = previous_root
+		st.window_ready_handler = previous_handler
+	}
+
 	fn test_windows_native_window_handle_reports_the_main_hwnd() {
 		previous := menu_window()
 		assert C.ui2_win_register_classes() != 0

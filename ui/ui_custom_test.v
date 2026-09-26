@@ -8,6 +8,13 @@ $if ui2_custom_rendering ? {
 
 	fn custom_test_drop_handler(_event DropEvent) {}
 
+	fn window_ready_custom_test_handler(handle voidptr) {
+		// The custom renderer has no native window; the hook must fire with
+		// nil. Report through the menu state so the test needs no globals.
+		assert handle == unsafe { nil }
+		menu_update_window(voidptr(usize(0x9abc)))
+	}
+
 	fn test_custom_desktop_backend_defaults() {
 		assert bounds() == Rect{
 			width: 800
@@ -17,6 +24,20 @@ $if ui2_custom_rendering ? {
 		assert control_support(.text_field) == .supported
 		assert control_support(.dropdown) == .partial
 		assert control_support(.text_area) == .partial
+	}
+
+	fn test_custom_window_ready_hook_fires_with_nil_handle() {
+		previous_window := menu_window()
+		previous_handler := g_window_ready_handler
+		on_window_ready(window_ready_custom_test_handler)
+		custom_fire_window_ready()
+		assert native_window_handle() == voidptr(usize(0x9abc))
+		// Without a handler firing is a silent no-op.
+		on_window_ready(WindowReadyFn(unsafe { nil }))
+		menu_update_window(previous_window)
+		custom_fire_window_ready()
+		assert native_window_handle() == previous_window
+		g_window_ready_handler = previous_handler
 	}
 
 	fn test_custom_desktop_backend_exposes_desktop_hooks() {
