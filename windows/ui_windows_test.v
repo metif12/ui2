@@ -223,6 +223,32 @@ $if !ui2_custom_rendering ? {
 		st.window_ready_handler = previous_handler
 	}
 
+	fn window_resize_test_handler(width int, height int) {
+		// Report through the state so the test needs no globals.
+		mut st := windows_state()
+		st.scroll_positions['resize_test_w'] = width
+		st.scroll_positions['resize_test_h'] = height
+	}
+
+	fn test_windows_window_resize_hook_reports_client_size() {
+		mut st := windows_state()
+		previous_handler := st.window_resize_handler
+		st.scroll_positions.delete('resize_test_w')
+		st.scroll_positions.delete('resize_test_h')
+		on_window_resize(window_resize_test_handler)
+		windows_fire_window_resize(800, 600)
+		assert st.scroll_positions['resize_test_w'] or { -1 } == 800
+		assert st.scroll_positions['resize_test_h'] or { -1 } == 600
+		// Without a handler firing is a silent no-op.
+		on_window_resize(WindowResizeFn(unsafe { nil }))
+		windows_fire_window_resize(1, 2)
+		assert st.scroll_positions['resize_test_w'] or { -1 } == 800
+		assert st.scroll_positions['resize_test_h'] or { -1 } == 600
+		st.scroll_positions.delete('resize_test_w')
+		st.scroll_positions.delete('resize_test_h')
+		st.window_resize_handler = previous_handler
+	}
+
 	fn test_windows_native_window_handle_reports_the_main_hwnd() {
 		previous := menu_window()
 		assert C.ui2_win_register_classes() != 0

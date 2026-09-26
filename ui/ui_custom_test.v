@@ -40,6 +40,17 @@ $if ui2_custom_rendering ? {
 		g_window_ready_handler = previous_handler
 	}
 
+	fn window_resize_custom_test_handler(_width int, _height int) {}
+
+	fn test_custom_window_resize_hook_is_a_documented_noop() {
+		previous_handler := g_window_resize_handler
+		on_window_resize(window_resize_custom_test_handler)
+		assert voidptr(g_window_resize_handler) != unsafe { nil }
+		on_window_resize(WindowResizeFn(unsafe { nil }))
+		assert voidptr(g_window_resize_handler) == unsafe { nil }
+		g_window_resize_handler = previous_handler
+	}
+
 	fn test_custom_desktop_backend_exposes_desktop_hooks() {
 		on_key(custom_test_key_handler)
 		on_key_event(custom_test_key_event_handler)
