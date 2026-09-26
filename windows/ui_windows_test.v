@@ -199,6 +199,24 @@ $if !ui2_custom_rendering ? {
 		}
 	}
 
+	fn test_windows_native_window_handle_reports_the_main_hwnd() {
+		previous := menu_window()
+		assert C.ui2_win_register_classes() != 0
+		title := 'handle test'.to_wide()
+		root := C.ui2_win_create_main_window(title, 320, 200)
+		unsafe {
+			free(title)
+		}
+		assert root != unsafe { nil }
+		defer {
+			C.ui2_win_destroy(root)
+		}
+		menu_update_window(root)
+		assert native_window_handle() == root
+		menu_update_window(previous)
+		assert native_window_handle() == previous
+	}
+
 	fn test_windows_native_controls_keep_compact_text_layout() {
 		assert C.ui2_win_register_classes() != 0
 		assert C.ui2_win_visual_styles_enabled() != 0

@@ -174,3 +174,14 @@ fn test_disabled_keeps_the_rest_of_the_row() {
 	assert row.shortcut == 'cmd+s'
 	assert !row.enabled
 }
+
+fn test_native_window_handle_reports_the_published_handle() {
+	previous := menu_window()
+	fake := voidptr(usize(0x1234))
+	menu_update_window(fake)
+	assert native_window_handle() == fake
+	menu_update_window(unsafe { nil })
+	assert native_window_handle() == unsafe { nil }
+	menu_update_window(previous)
+	assert native_window_handle() == previous
+}
