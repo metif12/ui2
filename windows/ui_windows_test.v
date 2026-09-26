@@ -267,6 +267,85 @@ $if !ui2_custom_rendering ? {
 		assert native_window_handle() == previous
 	}
 
+	fn menu_command_test_handler(id string) {
+		// Report through the menu state so the test needs no globals.
+		set_menu_bar([Menu{
+			title: 'got:' + id
+			items: [menu_item('x', 'X')]
+		}])
+	}
+
+	fn test_windows_menu_bar_and_tray_cover_vails_scenarios() {
+		previous_window := menu_window()
+		previous_app := menu_app_name()
+		previous_menus := menu_bar()
+		previous_tray := tray()
+		previous_tray_visible := tray_visible()
+		assert C.ui2_win_register_classes() != 0
+		title := 'menu test'.to_wide()
+		root := C.ui2_win_create_main_window(title, 320, 200)
+		unsafe {
+			free(title)
+		}
+		assert root != unsafe { nil }
+		defer {
+			C.ui2_win_destroy(root)
+		}
+		publish_menu_context(menu_command_test_handler, 'MenuTest', root)
+		// A dynamic menu bar: installing twice replaces the declaration.
+		set_menu_bar([Menu{
+			title: 'File'
+			items: [menu_item('new', 'New')]
+		}])
+		assert menu_bar()[0].title == 'File'
+		set_menu_bar([Menu{
+			title: 'Edit'
+			items: [menu_item('copy', 'Copy')]
+		}])
+		assert menu_bar()[0].title == 'Edit'
+		// A menu bar command reaches the window event handler: 'copy' is the
+		// first emitting row, so it owns win_menu_command_base.
+		windows_handle_menu_command(win_menu_command_base)
+		assert menu_bar()[0].title == 'got:copy'
+		// Tray tooltip updates replace the declaration.
+		set_tray(TrayConfig{
+			id: 'tray_open'
+			title: 'App'
+			tooltip: 'v1'
+		})
+		assert tray_visible()
+		assert tray().tooltip == 'v1'
+		set_tray(TrayConfig{
+			id: 'tray_open'
+			title: 'App'
+			tooltip: 'v2'
+		})
+		assert tray().tooltip == 'v2'
+		// A tray icon without a menu emits its id on left-click...
+		set_menu_bar([Menu{
+			title: 'Edit'
+			items: [menu_item('copy', 'Copy')]
+		}])
+		windows_handle_tray_message(win_wm_lbutton_up)
+		assert menu_bar()[0].title == 'got:tray_open'
+		// ...and emits nothing on right-click.
+		set_menu_bar([Menu{
+			title: 'Edit'
+			items: [menu_item('copy', 'Copy')]
+		}])
+		windows_handle_tray_message(win_wm_rbutton_up)
+		assert menu_bar()[0].title == 'Edit'
+		remove_tray()
+		assert !tray_visible()
+		set_menu_bar(previous_menus)
+		if previous_tray_visible {
+			set_tray(previous_tray)
+		} else {
+			remove_tray()
+		}
+		publish_menu_context(EventFn(unsafe { nil }), previous_app, previous_window)
+	}
+
 	fn test_windows_native_controls_keep_compact_text_layout() {
 		assert C.ui2_win_register_classes() != 0
 		assert C.ui2_win_visual_styles_enabled() != 0
