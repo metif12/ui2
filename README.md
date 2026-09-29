@@ -476,6 +476,17 @@ exception, since they place the caret by measuring the whole string.
 use UTF-16 code-unit offsets. This is intentional; grapheme-cluster editing is
 outside the portable editor's current contract.
 
+Read-only text that an application paints itself (a transcript on a canvas,
+say) can use `TextRangeSelection` for mouse selection. Register the lines you
+draw each frame as `SelectableTextLine` values, map pointer events to a
+`TextPosition` (block, line, rune column) with `text_position_at`, and feed it
+to `press`, `drag`, and `release`; `line_columns` then tells you which runes
+of each line to highlight and copy. A press only turns into a selection once
+the pointer moves past `text_selection_drag_threshold`, so clicks on links
+drawn in the same text still work. `ClickCounter` and `text_word_range` cover
+double-click word selection, and `text_column_at_x` maps an x offset to a
+column given a prefix-width function.
+
 ## Fonts and text sizes
 
 `TextStyle.size` is in points. Win32 and the Linux desktops resolve a point at
