@@ -150,6 +150,7 @@ $if (android || linux || ((macos || windows) && ui2_custom_rendering ?)) && !ui2
 	__global g_scroll_handler = ScrollFn(unsafe { nil })
 	__global g_drop_handler = DropFn(unsafe { nil })
 	__global g_window_ready_handler = WindowReadyFn(unsafe { nil })
+	__global g_window_resize_handler = WindowResizeFn(unsafe { nil })
 	__global g_key_consumed = false
 	__global g_gg_app = &GgApp{}
 	__global g_text_values = map[string]string{}
@@ -368,6 +369,14 @@ $if (android || linux || ((macos || windows) && ui2_custom_rendering ?)) && !ui2
 			return
 		}
 		g_window_ready_handler(unsafe { nil })
+	}
+
+	// on_window_resize only stores the handler: a documented no-op. The custom
+	// renderer draws inside its own window, so there is no native child to
+	// resize — but accepting the registration keeps embedder code uniform
+	// across backends.
+	pub fn on_window_resize(handler WindowResizeFn) {
+		g_window_resize_handler = handler
 	}
 
 	pub fn text(id string) string {

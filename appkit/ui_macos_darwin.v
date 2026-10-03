@@ -78,6 +78,7 @@ mut:
 	scroll_handler      ScrollFn = ScrollFn(unsafe { nil })
 	drop_handler        DropFn = DropFn(unsafe { nil })
 	window_ready_handler WindowReadyFn = WindowReadyFn(unsafe { nil })
+	window_resize_handler WindowResizeFn = WindowResizeFn(unsafe { nil })
 	window              NativeView
 	root_view           NativeView
 	button_handler      NativeView
@@ -333,6 +334,28 @@ fn fire_window_ready() {
 		return
 	}
 	st.window_ready_handler(st.window)
+}
+
+// on_window_resize registers a handler called with the content size in pixels
+// whenever the window is resized, so an embedder can size its child view to
+// match.
+pub fn on_window_resize(handler WindowResizeFn) {
+	mut st := state()
+	st.window_resize_handler = handler
+}
+
+// fire_window_resize notifies the embedder registered through
+// on_window_resize, if any.
+fn fire_window_resize() {
+	st := state()
+	if voidptr(st.window_resize_handler) == unsafe { nil } {
+		return
+	}
+	if native_is_nil(st.root_view) {
+		return
+	}
+	b := native_bounds(st.root_view)
+	st.window_resize_handler(int(b.width), int(b.height))
 }
 
 // set_window_title updates the current AppKit window title.
@@ -2970,6 +2993,7 @@ fn ui2_bounds_changed(_self voidptr, _cmd voidptr, notification voidptr) {
 @[export: 'ui2_window_did_resize']
 fn ui2_window_did_resize(_self voidptr, _cmd voidptr, _notification voidptr) {
 	refresh()
+	fire_window_resize()
 }
 
 @[export: 'ui2_window_key_down']
