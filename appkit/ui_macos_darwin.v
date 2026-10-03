@@ -77,6 +77,7 @@ mut:
 	text_key_consumed   bool
 	scroll_handler      ScrollFn = ScrollFn(unsafe { nil })
 	drop_handler        DropFn = DropFn(unsafe { nil })
+	window_ready_handler WindowReadyFn = WindowReadyFn(unsafe { nil })
 	window              NativeView
 	root_view           NativeView
 	button_handler      NativeView
@@ -313,6 +314,25 @@ pub fn on_scroll(handler ScrollFn) {
 pub fn on_drop(handler DropFn) {
 	mut st := state()
 	st.drop_handler = handler
+}
+
+// on_window_ready registers a handler called with the NSWindow after the
+// application has finished launching, the window has been ordered front and
+// the first frame has been rendered. An embedder creates its child view
+// inside it.
+pub fn on_window_ready(handler WindowReadyFn) {
+	mut st := state()
+	st.window_ready_handler = handler
+}
+
+// fire_window_ready notifies the embedder registered through on_window_ready,
+// if any.
+fn fire_window_ready() {
+	st := state()
+	if voidptr(st.window_ready_handler) == unsafe { nil } {
+		return
+	}
+	st.window_ready_handler(st.window)
 }
 
 // set_window_title updates the current AppKit window title.
@@ -2674,6 +2694,7 @@ fn ui2_app_did_finish_launching(_self voidptr, _cmd voidptr, _notification voidp
 	native_make_key_and_order_front(st.window)
 	native_activate()
 	refresh()
+	fire_window_ready()
 }
 
 fn fire_pointer_event(native NativeView, phase string, event voidptr) {
