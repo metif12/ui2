@@ -208,6 +208,12 @@ pub type MouseButtonFn = fn (button int, down bool, x f64, y f64)
 // WheelFn reports raw wheel deltas before any scroll element sees them.
 pub type WheelFn = fn (dx f64, dy f64)
 
+// WindowReadyFn receives the main window's native handle once the window has
+// been created and shown, before the event loop starts. It lets an embedder
+// (e.g. a webview child) attach to the window. The handle is nil on backends
+// without a native window (custom renderer).
+pub type WindowReadyFn = fn (handle voidptr)
+
 pub struct DropEvent {
 pub:
 	paths []string
