@@ -75,7 +75,7 @@ jobs:
 
       - name: Test VML menu declarations
         id: test_vml_menu_declarations
-        if: ${{ !cancelled() && steps.uses_checkout_v4.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.uses_checkout_v4.outcome == 'success' }}
         run: v ${{ matrix.custom && '-d ui2_custom_rendering' || '' }} test ui2/ui/vml_menu_test.v
 
       - name: Test immediate scrolling
@@ -93,5 +93,5 @@ jobs:
 
       - name: Build all examples
         id: build_all_examples
-        if: ${{ !cancelled() && steps.test_vml_menu_declarations.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.test_vml_menu_declarations.outcome == 'success' }}
         run: v run ui2/examples/build_examples.vsh ${{ matrix.custom && '-d ui2_custom_rendering' || '' }}

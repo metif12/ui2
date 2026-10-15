@@ -40,7 +40,7 @@ jobs:
 
       - name: Install V 0.5.2
         id: install_v_0_5_2
-        if: ${{ !cancelled() && steps.uses_checkout_v4.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.uses_checkout_v4.outcome == 'success' }}
         shell: bash
         run: |
           curl --fail --location --retry 3 \
@@ -52,7 +52,7 @@ jobs:
 
       - name: Install Linux development dependencies
         id: install_linux_development_dependencies
-        if: ${{ !cancelled() && steps.install_v_0_5_2.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.install_v_0_5_2.outcome == 'success' }}
         run: |
           sudo apt-get update -qq
           sudo apt-get install --quiet -y --no-install-recommends \
@@ -61,20 +61,20 @@ jobs:
 
       - name: Check the IDE
         id: check_the_ide
-        if: ${{ !cancelled() && steps.install_linux_development_dependencies.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.install_linux_development_dependencies.outcome == 'success' }}
         run: v -check ui2/ide
 
       - name: Test layout geometry
         id: test_layout_geometry
-        if: ${{ !cancelled() && steps.check_the_ide.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.check_the_ide.outcome == 'success' }}
         run: v test ui2/ui/adaptive_layout_test.v
 
       - name: Test adaptive VML
         id: test_adaptive_vml
-        if: ${{ !cancelled() && steps.test_layout_geometry.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.test_layout_geometry.outcome == 'success' }}
         run: v test ui2/ui/vml_adaptive_test.v
 
       - name: Test designer and generated companion
         id: test_designer_and_generated_companion
-        if: ${{ !cancelled() && steps.test_adaptive_vml.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.test_adaptive_vml.outcome == 'success' }}
         run: v test ui2/ide

@@ -17,7 +17,7 @@ jobs:
           tar -czf vml-headers.tar.gz -C /usr/include GL EGL KHR X11 alsa
       - uses: actions/upload-artifact@v4
         id: uses_upload_artifact_v4
-        if: ${{ !cancelled() && steps.package_linux_ui_development_headers.outcome == 'success' }}
+        if: ${{ success() && !cancelled() && steps.package_linux_ui_development_headers.outcome == 'success' }}
         with:
           name: vml-headers
           path: vml-headers.tar.gz
