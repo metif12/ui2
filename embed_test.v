@@ -50,9 +50,16 @@ $if windows && !ui2_custom_rendering ? {
 	// when no handler is registered.
 	fn test_windows_window_ready_hook_fires_with_main_hwnd() {
 		previous_window := menu_window()
+		defer {
+			menu_update_window(previous_window)
+		}
 		mut st := windows_state()
 		previous_root := st.root
-		previous_handler := st.window_ready_handler
+		previous_handler := st.window_ready_fn
+		defer {
+			st.root = previous_root
+			st.window_ready_fn = previous_handler
+		}
 		fake := voidptr(usize(0x5678))
 		st.root = fake
 		on_window_ready(window_ready_test_handler)
@@ -62,8 +69,6 @@ $if windows && !ui2_custom_rendering ? {
 		menu_update_window(previous_window)
 		windows_fire_window_ready()
 		assert native_window_handle() == previous_window
-		st.root = previous_root
-		st.window_ready_handler = previous_handler
 	}
 }
 
@@ -78,7 +83,13 @@ $if ui2_custom_rendering ? {
 
 	fn test_custom_window_ready_hook_fires_with_nil_handle() {
 		previous_window := menu_window()
+		defer {
+			menu_update_window(previous_window)
+		}
 		previous_handler := g_window_ready_handler
+		defer {
+			g_window_ready_handler = previous_handler
+		}
 		on_window_ready(window_ready_custom_test_handler)
 		custom_fire_window_ready()
 		assert native_window_handle() == voidptr(usize(0x9abc))
@@ -87,6 +98,5 @@ $if ui2_custom_rendering ? {
 		menu_update_window(previous_window)
 		custom_fire_window_ready()
 		assert native_window_handle() == previous_window
-		g_window_ready_handler = previous_handler
 	}
 }

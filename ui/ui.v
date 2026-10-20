@@ -210,8 +210,11 @@ pub type WheelFn = fn (dx f64, dy f64)
 
 // WindowReadyFn receives the main window's native handle once the window has
 // been created and shown, before the event loop starts. It lets an embedder
-// (e.g. a webview child) attach to the window. The handle is nil on backends
-// without a native window (custom renderer).
+// (e.g. a webview child) attach to the window. Each backend has built its
+// screen once by the time the hook fires, so an embedder whose state the
+// screen builder reads must set it up before calling run_window. The hook
+// receives nil where embedding is not supported: the custom renderer and
+// Linux.
 pub type WindowReadyFn = fn (handle voidptr)
 
 pub struct DropEvent {

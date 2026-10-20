@@ -510,10 +510,11 @@ $if (android || linux || ((macos || windows) && ui2_custom_rendering ?)) && !ui2
 		g_drop_handler = handler
 	}
 
-	// on_window_ready registers a handler called with nil once the window
-	// exists: the custom renderer draws inside its own window and has no
-	// native handle to embed into. The call keeps embedder code uniform
-	// across backends.
+	// on_window_ready registers a handler called with nil inside gg's init
+	// callback, after the screen has been built once and before the frame
+	// loop. Embedding is not supported on the gg backends (custom renderer,
+	// and Linux which shares this file), so the nil keeps embedder code
+	// uniform across backends.
 	pub fn on_window_ready(handler WindowReadyFn) {
 		g_window_ready_handler = handler
 	}

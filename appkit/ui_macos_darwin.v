@@ -102,7 +102,7 @@ mut:
 	text_key_consumed   bool
 	scroll_handler      ScrollFn = ScrollFn(unsafe { nil })
 	drop_handler        DropFn = DropFn(unsafe { nil })
-	window_ready_handler WindowReadyFn = WindowReadyFn(unsafe { nil })
+	window_ready_fn     WindowReadyFn = WindowReadyFn(unsafe { nil })
 	window              NativeView
 	root_view           NativeView
 	button_handler      NativeView
@@ -376,17 +376,17 @@ pub fn on_drop(handler DropFn) {
 // inside it.
 pub fn on_window_ready(handler WindowReadyFn) {
 	mut st := state()
-	st.window_ready_handler = handler
+	st.window_ready_fn = handler
 }
 
 // fire_window_ready notifies the embedder registered through on_window_ready,
 // if any.
 fn fire_window_ready() {
 	st := state()
-	if voidptr(st.window_ready_handler) == unsafe { nil } {
+	if voidptr(st.window_ready_fn) == unsafe { nil } {
 		return
 	}
-	st.window_ready_handler(st.window)
+	st.window_ready_fn(st.window)
 }
 
 // set_window_title updates the current AppKit window title.

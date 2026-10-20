@@ -407,7 +407,7 @@ mut:
 	key_event_handler  KeyEventFn = KeyEventFn(unsafe { nil })
 	scroll_handler     ScrollFn = ScrollFn(unsafe { nil })
 	drop_handler       DropFn = DropFn(unsafe { nil })
-	window_ready_handler WindowReadyFn = WindowReadyFn(unsafe { nil })
+	window_ready_fn    WindowReadyFn = WindowReadyFn(unsafe { nil })
 	root               voidptr
 	nodes              map[string]voidptr
 	node_kinds         map[string]Kind
@@ -833,17 +833,17 @@ pub fn on_drop(handler DropFn) {
 // embedder creates its child window (e.g. a webview) inside it.
 pub fn on_window_ready(handler WindowReadyFn) {
 	mut st := windows_state()
-	st.window_ready_handler = handler
+	st.window_ready_fn = handler
 }
 
 // windows_fire_window_ready notifies the embedder registered through
 // on_window_ready, if any.
 fn windows_fire_window_ready() {
 	st := windows_state()
-	if voidptr(st.window_ready_handler) == unsafe { nil } {
+	if voidptr(st.window_ready_fn) == unsafe { nil } {
 		return
 	}
-	st.window_ready_handler(st.root)
+	st.window_ready_fn(st.root)
 }
 
 // set_window_title updates the current Win32 window title.
