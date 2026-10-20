@@ -83,6 +83,9 @@ mut:
 	// is how the per-platform menu code reaches the window's event handler, the
 	// name to build a macOS application menu from, and the native handle a
 	// Win32 menu bar attaches to — without depending on one backend's state.
+	// The window doubles as the embedder-facing main window handle reported by
+	// native_window_handle; menu_update_window publishes it late on backends
+	// whose window only exists after the event loop starts (AppKit).
 	dispatch EventFn = EventFn(unsafe { nil })
 	app_name string = 'App'
 	window   voidptr

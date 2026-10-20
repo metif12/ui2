@@ -1444,6 +1444,9 @@ fn windows_dispose_all() {
 	windows_release_all_node_resources()
 	st.nodes = map[string]voidptr{}
 	st.root = unsafe { nil }
+	// The window is gone, so native_window_handle must stop reporting it;
+	// otherwise embedders read a dangling HWND after the message loop ends.
+	menu_update_window(unsafe { nil })
 }
 
 fn windows_release_all_node_resources() {

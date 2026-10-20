@@ -10,19 +10,23 @@ module ui2
 // The accessor reports whatever handle the backend published, on every backend.
 fn test_native_window_handle_reports_the_published_handle() {
 	previous := menu_window()
+	defer {
+		menu_update_window(previous)
+	}
 	fake := voidptr(usize(0x1234))
 	menu_update_window(fake)
 	assert native_window_handle() == fake
 	menu_update_window(unsafe { nil })
 	assert native_window_handle() == unsafe { nil }
-	menu_update_window(previous)
-	assert native_window_handle() == previous
 }
 
 $if windows && !ui2_custom_rendering ? {
 	// On Windows the published handle is the real HWND of the main window.
 	fn test_windows_native_window_handle_reports_the_main_hwnd() {
 		previous := menu_window()
+		defer {
+			menu_update_window(previous)
+		}
 		assert C.ui2_win_register_classes() != 0
 		title := 'handle test'.to_wide()
 		root := C.ui2_win_create_main_window(title, 320, 200)
@@ -35,7 +39,5 @@ $if windows && !ui2_custom_rendering ? {
 		}
 		menu_update_window(root)
 		assert native_window_handle() == root
-		menu_update_window(previous)
-		assert native_window_handle() == previous
 	}
 }
