@@ -217,6 +217,20 @@ pub type WheelFn = fn (dx f64, dy f64)
 // Linux.
 pub type WindowReadyFn = fn (handle voidptr)
 
+// WindowResizeFn receives the main window's client size whenever it changes,
+// so an embedder can resize its child (e.g. a webview) to match. ui2 never
+// manages the child itself. The hook does not fire for the initial window
+// size: create and size the child in the on_window_ready callback instead.
+//
+//   - Windows: client size in physical pixels. The hook also fires with 0x0
+//     while the window is minimized, then with the real size again on
+//     restore.
+//   - macOS: content size in AppKit points, not pixels; the two differ on
+//     Retina displays.
+//   - Immediate renderer (Linux, Android, and the custom renderer on every
+//     platform): never fires, because there is no native child to size.
+pub type WindowResizeFn = fn (width int, height int)
+
 pub struct DropEvent {
 pub:
 	paths []string

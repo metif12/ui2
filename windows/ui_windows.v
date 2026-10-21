@@ -408,6 +408,7 @@ mut:
 	scroll_handler     ScrollFn = ScrollFn(unsafe { nil })
 	drop_handler       DropFn = DropFn(unsafe { nil })
 	window_ready_fn    WindowReadyFn = WindowReadyFn(unsafe { nil })
+	window_resize_fn   WindowResizeFn = WindowResizeFn(unsafe { nil })
 	root               voidptr
 	nodes              map[string]voidptr
 	node_kinds         map[string]Kind
@@ -844,6 +845,25 @@ fn windows_fire_window_ready() {
 		return
 	}
 	st.window_ready_fn(st.root)
+}
+
+// on_window_resize registers a handler called with the client size in
+// physical pixels whenever the main window is resized, so an embedder can
+// size its child window (e.g. a webview) to match. A minimized window
+// reports 0x0; the real size follows on restore.
+pub fn on_window_resize(handler WindowResizeFn) {
+	mut st := windows_state()
+	st.window_resize_fn = handler
+}
+
+// windows_fire_window_resize notifies the embedder registered through
+// on_window_resize, if any.
+fn windows_fire_window_resize(width int, height int) {
+	st := windows_state()
+	if voidptr(st.window_resize_fn) == unsafe { nil } {
+		return
+	}
+	st.window_resize_fn(width, height)
 }
 
 // set_window_title updates the current Win32 window title.
@@ -2309,8 +2329,11 @@ fn ui2_windows_window_proc(hwnd voidptr, message u32, wparam usize, lparam isize
 			return 0
 		}
 		win_wm_size {
-			if hwnd == st.root && !st.rendering {
-				refresh()
+			if hwnd == st.root {
+				if !st.rendering {
+					refresh()
+				}
+				windows_fire_window_resize(C.ui2_win_client_width(hwnd), C.ui2_win_client_height(hwnd))
 			}
 			return 0
 		}
