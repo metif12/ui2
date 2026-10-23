@@ -68,8 +68,8 @@ pub mut:
 	source_text        string
 	source_modified    bool
 	dirty              bool
-	show_grid          bool   = true
-	snap_to_grid       bool   = true
+	show_grid          bool = true
+	snap_to_grid       bool = true
 	show_debug_overlay bool
 	output_open        bool   = true
 	status             string = 'Choose a component, then click the form to place it.'
@@ -194,6 +194,12 @@ fn component_title(kind string) string {
 		'drawer' { 'Drawer' }
 		'snackbar' { 'Snack bar' }
 		'list_tile' { 'List tile' }
+		'icon_button' { 'Icon button' }
+		'radio' { 'Radio' }
+		'icon' { 'Icon' }
+		'spacer' { 'Spacer' }
+		'alert_dialog' { 'Alert dialog' }
+		'bottom_sheet' { 'Bottom sheet' }
 		else { kind }
 	}
 }
@@ -219,6 +225,12 @@ fn component_tag(kind string) string {
 		'drawer' { 'Drawer' }
 		'snackbar' { 'SnackBar' }
 		'list_tile' { 'ListTile' }
+		'icon_button' { 'IconButton' }
+		'radio' { 'Radio' }
+		'icon' { 'Icon' }
+		'spacer' { 'Spacer' }
+		'alert_dialog' { 'AlertDialog' }
+		'bottom_sheet' { 'BottomSheet' }
 		else { '' }
 	}
 }
@@ -244,6 +256,12 @@ fn tag_component_kind(tag string) string {
 		'Drawer' { 'drawer' }
 		'SnackBar' { 'snackbar' }
 		'ListTile' { 'list_tile' }
+		'IconButton' { 'icon_button' }
+		'Radio' { 'radio' }
+		'Icon' { 'icon' }
+		'Spacer' { 'spacer' }
+		'AlertDialog' { 'alert_dialog' }
+		'BottomSheet' { 'bottom_sheet' }
 		else { '' }
 	}
 }
@@ -269,6 +287,12 @@ fn component_default_size(kind string) (f64, f64) {
 		'drawer' { 240.0, 320.0 }
 		'snackbar' { 300.0, 48.0 }
 		'list_tile' { 260.0, 64.0 }
+		'icon_button' { 40.0, 40.0 }
+		'radio' { 140.0, 30.0 }
+		'icon' { 32.0, 32.0 }
+		'spacer' { 40.0, 40.0 }
+		'alert_dialog' { 320.0, 180.0 }
+		'bottom_sheet' { 320.0, 240.0 }
 		else { 120.0, 36.0 }
 	}
 }
@@ -289,6 +313,10 @@ fn component_default_background(kind string) u32 {
 		'drawer' { u32(0xffffff) }
 		'snackbar' { u32(0x323232) }
 		'list_tile' { u32(0xffffff) }
+		'icon_button' { u32(0xffffff) }
+		'radio' { u32(0xffffff) }
+		'alert_dialog' { u32(0xffffff) }
+		'bottom_sheet' { u32(0xffffff) }
 		else { u32(0xffffff) }
 	}
 }
@@ -308,6 +336,10 @@ fn component_default_text(kind string, ordinal int) string {
 		'fab' { '+' }
 		'app_bar' { 'App bar' }
 		'list_tile' { 'List tile ${ordinal}' }
+		'icon_button' { '+' }
+		'radio' { 'Radio ${ordinal}' }
+		'icon' { '★' }
+		'alert_dialog' { 'Alert' }
 		else { component_title(kind) }
 	}
 }
@@ -889,6 +921,26 @@ fn component_vml(component DesignerComponent) string {
 		}
 		'list_tile' {
 			properties << 'title: "${vml_escape(component.text)}"'
+		}
+		'icon_button' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+		}
+		'radio' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'selected: false'
+		}
+		'icon' {
+			properties << 'text: "${vml_escape(component.text)}"'
+		}
+		'alert_dialog' {
+			properties << 'title: "${vml_escape(component.text)}"'
+			properties << 'text: "Message"'
+			properties << 'background: ${color_hex(component.background)}'
+		}
+		'bottom_sheet' {
+			properties << 'open: false'
+			properties << 'background: ${color_hex(component.background)}'
 		}
 		else {}
 	}
