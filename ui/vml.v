@@ -907,6 +907,65 @@ fn node_to_element_base(node &VNode, frame Rect) !Element {
 		'Image' {
 			return image(node.id, node.prop_or('source', node.prop('path')), frame)
 		}
+		'Card' {
+			return card(node.id, frame, v_box(node), v_children(node, local)!)
+		}
+		'Divider' {
+			return divider(node.id, frame, v_color(node, 'color', 0xcbd5e1), node.prop_or('thickness', '1').f64())
+		}
+		'Chip' {
+			return Element{
+				...chip(node.id, frame, node.prop('text'), v_box(node), v_text_style(node))
+				action_id: node.prop('on_tap')
+			}
+		}
+		'Badge' {
+			mut badge_style := v_text_style(node)
+			return badge(node.id, frame, node.prop('text'), v_box(node), badge_style)
+		}
+		'FloatingActionButton' {
+			return Element{
+				...floating_action_button(node.id, frame, node.prop_or('icon', node.prop('text')), v_box(node), v_text_style(node))
+				action_id: node.prop('on_tap')
+			}
+		}
+		'AppBar' {
+			return app_bar(node.id, frame, node.prop('title'), v_box(node), v_text_style(node))
+		}
+		'SnackBar' {
+			return snack_bar(node.id, frame, node.prop('text'), v_box(node), v_text_style(node))
+		}
+		'BottomNavigationBar' {
+			return bottom_navigation_bar(node.id, frame, v_options(node), node.prop_or('selected', '0').int(), v_box(node), v_text_style(node))
+		}
+		'Drawer' {
+			return drawer(node.id, frame, node.prop_bool('open'), v_box(node), v_children(node, local)!)
+		}
+		'ListTile' {
+			mut leading := Element{}
+			mut trailing := Element{}
+			for child in node.children {
+				if child.tag == 'Leading' {
+					// treat first child as leading container
+				}
+			}
+			return list_tile(node.id, frame, leading, node.prop_or('title', node.prop('text')), node.prop('subtitle'), trailing, v_box(node))
+		}
+		'Scaffold' {
+			mut app_bar_el := Element{}
+			mut body_el := Element{}
+			mut bottom_nav := Element{}
+			// First view child becomes body if no explicit
+			mut bodies := []Element{}
+			for child in node.children {
+				if v_is_layout_metadata(child) { continue }
+				bodies << node_to_element(child, local)!
+			}
+			if bodies.len > 0 {
+				body_el = bodies[0]
+			}
+			return scaffold(node.id, frame, app_bar_el, body_el, bottom_nav, v_box(node))
+		}
 		'ProgressBar' {
 			return progress_bar(
 				id:         node.id
