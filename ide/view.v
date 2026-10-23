@@ -211,6 +211,12 @@ fn build_palette(layout IdeLayout, app &IdeApp) ui2.Element {
 		['app_bar', 'App bar'],
 		['list_tile', 'List tile'],
 		['divider', 'Divider'],
+		['icon_button', 'Icon btn'],
+		['radio', 'Radio'],
+		['icon', 'Icon'],
+		['spacer', 'Spacer'],
+		['alert_dialog', 'Alert'],
+		['bottom_sheet', 'Sheet'],
 	]
 	mut children := [
 		ui2.label('', 'STANDARD', ui2.rect(14, 7, 82, 16), text_style(9, color_muted, true)),
