@@ -70,6 +70,7 @@ pub mut:
 	dirty              bool
 	show_grid          bool   = true
 	snap_to_grid       bool   = true
+	show_debug_overlay bool
 	output_open        bool   = true
 	status             string = 'Choose a component, then click the form to place it.'
 	messages           string
@@ -182,6 +183,17 @@ fn component_title(kind string) string {
 		'dropdown' { 'Dropdown' }
 		'rectangle' { 'Rectangle' }
 		'image' { 'Image' }
+		'card' { 'Card' }
+		'divider' { 'Divider' }
+		'chip' { 'Chip' }
+		'badge' { 'Badge' }
+		'fab' { 'Floating action button' }
+		'app_bar' { 'App bar' }
+		'scaffold' { 'Scaffold' }
+		'bottom_nav' { 'Bottom navigation bar' }
+		'drawer' { 'Drawer' }
+		'snackbar' { 'Snack bar' }
+		'list_tile' { 'List tile' }
 		else { kind }
 	}
 }
@@ -196,6 +208,17 @@ fn component_tag(kind string) string {
 		'dropdown' { 'Dropdown' }
 		'rectangle' { 'Rectangle' }
 		'image' { 'Image' }
+		'card' { 'Card' }
+		'divider' { 'Divider' }
+		'chip' { 'Chip' }
+		'badge' { 'Badge' }
+		'fab' { 'FloatingActionButton' }
+		'app_bar' { 'AppBar' }
+		'scaffold' { 'Scaffold' }
+		'bottom_nav' { 'BottomNavigationBar' }
+		'drawer' { 'Drawer' }
+		'snackbar' { 'SnackBar' }
+		'list_tile' { 'ListTile' }
 		else { '' }
 	}
 }
@@ -210,6 +233,17 @@ fn tag_component_kind(tag string) string {
 		'Dropdown' { 'dropdown' }
 		'Rectangle', 'View' { 'rectangle' }
 		'Image' { 'image' }
+		'Card' { 'card' }
+		'Divider' { 'divider' }
+		'Chip' { 'chip' }
+		'Badge' { 'badge' }
+		'FloatingActionButton' { 'fab' }
+		'AppBar' { 'app_bar' }
+		'Scaffold' { 'scaffold' }
+		'BottomNavigationBar' { 'bottom_nav' }
+		'Drawer' { 'drawer' }
+		'SnackBar' { 'snackbar' }
+		'ListTile' { 'list_tile' }
 		else { '' }
 	}
 }
@@ -224,6 +258,17 @@ fn component_default_size(kind string) (f64, f64) {
 		'dropdown' { 170.0, 36.0 }
 		'rectangle' { 160.0, 100.0 }
 		'image' { 120.0, 100.0 }
+		'card' { 220.0, 140.0 }
+		'divider' { 200.0, 8.0 }
+		'chip' { 96.0, 32.0 }
+		'badge' { 44.0, 22.0 }
+		'fab' { 56.0, 56.0 }
+		'app_bar' { 320.0, 56.0 }
+		'scaffold' { 320.0, 420.0 }
+		'bottom_nav' { 320.0, 56.0 }
+		'drawer' { 240.0, 320.0 }
+		'snackbar' { 300.0, 48.0 }
+		'list_tile' { 260.0, 64.0 }
 		else { 120.0, 36.0 }
 	}
 }
@@ -234,6 +279,16 @@ fn component_default_background(kind string) u32 {
 		'text_field', 'text_area', 'dropdown' { u32(0xffffff) }
 		'rectangle' { u32(0xdbeafe) }
 		'image' { u32(0xe2e8f0) }
+		'card' { u32(0xffffff) }
+		'chip' { u32(0xe2e8f0) }
+		'badge' { u32(0xef4444) }
+		'fab' { u32(0x2563eb) }
+		'app_bar' { u32(0x2563eb) }
+		'scaffold' { u32(0xf8fafc) }
+		'bottom_nav' { u32(0xffffff) }
+		'drawer' { u32(0xffffff) }
+		'snackbar' { u32(0x323232) }
+		'list_tile' { u32(0xffffff) }
 		else { u32(0xffffff) }
 	}
 }
@@ -248,6 +303,11 @@ fn component_default_text(kind string, ordinal int) string {
 		'dropdown' { 'Option 1' }
 		'rectangle' { '' }
 		'image' { '' }
+		'chip' { 'Chip ${ordinal}' }
+		'badge' { '${ordinal}' }
+		'fab' { '+' }
+		'app_bar' { 'App bar' }
+		'list_tile' { 'List tile ${ordinal}' }
 		else { component_title(kind) }
 	}
 }
@@ -795,6 +855,40 @@ fn component_vml(component DesignerComponent) string {
 			if component.text.len > 0 {
 				properties << 'source: "${vml_escape(component.text)}"'
 			}
+		}
+		'card' {
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'corner_radius: 12'
+		}
+		'chip' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'color: ${color_hex(component.color)}'
+			properties << 'corner_radius: ${component.height / 2:g}'
+		}
+		'badge' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'color: #FFFFFF'
+		}
+		'fab' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'color: #FFFFFF'
+			properties << 'corner_radius: ${component.width / 2:g}'
+		}
+		'app_bar' {
+			properties << 'title: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'color: ${color_hex(component.color)}'
+		}
+		'snackbar' {
+			properties << 'text: "${vml_escape(component.text)}"'
+			properties << 'background: ${color_hex(component.background)}'
+			properties << 'color: #FFFFFF'
+		}
+		'list_tile' {
+			properties << 'title: "${vml_escape(component.text)}"'
 		}
 		else {}
 	}
