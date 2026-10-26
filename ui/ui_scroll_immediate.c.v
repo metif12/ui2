@@ -661,12 +661,10 @@ $if (android || linux || ((macos || windows) && ui2_custom_rendering ?)) && !ui2
 		text_clip := intersect_rect(content, clip)
 		if text_clip.width > 0 && text_clip.height > 0 {
 			apply_clip(ctx, text_clip)
-			base_x := content.x
-			base_w := content.width
 			text_x := match style.align {
-				.left { base_x }
-				.center { base_x + base_w / 2 }
-				.right { base_x + base_w }
+				.left { content.x }
+				.center { content.x + content.width / 2 }
+				.right { content.x + content.width }
 			}
 			first, last := visible_text_area_rows(lines.len, content.y, line_height, offset, text_clip)
 			for index in first .. last {
