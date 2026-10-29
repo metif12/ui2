@@ -70,7 +70,7 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --quiet -y --no-install-recommends \
-            libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev
+            libx11-dev libxcursor-dev libxi-dev libgl1-mesa-dev libasound2-dev xvfb
 
       - name: Test component catalog and primitives
         run: v ${{ matrix.custom && '-d ui2_custom_rendering' || '' }} test ui2/ui/component_catalog_test.v
@@ -102,3 +102,11 @@ jobs:
 
       - name: Build all examples
         run: v run ui2/examples/build_examples.vsh ${{ matrix.custom && '-d ui2_custom_rendering' || '' }}
+
+      - name: Smoke-test custom renderer at runtime
+        if: runner.os == 'Linux' && matrix.custom
+        run: |
+          v ${{ matrix.custom && '-d ui2_custom_rendering' || '' }} -o /tmp/ui2-users-smoke ui2/examples/users
+          # The example opens a window and never exits on its own; a clean
+          # startup (no abort/assert) that survives a few seconds is a pass.
+          xvfb-run -a timeout 15s /tmp/ui2-users-smoke || test $? -eq 124
