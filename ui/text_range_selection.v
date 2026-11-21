@@ -342,8 +342,8 @@ pub mut:
 // press starts over at 1.
 pub fn (mut c ClickCounter) press(x f64, y f64, now_ms i64) int {
 	quick := c.count > 0 && now_ms - c.last_ms <= multi_click_interval_ms
-	near := math.abs(x - c.last_x) <= multi_click_slop && math.abs(y - c.last_y) <= multi_click_slop
-	c.count = if quick && near && c.count < 3 { c.count + 1 } else { 1 }
+	nearby := math.abs(x - c.last_x) <= multi_click_slop && math.abs(y - c.last_y) <= multi_click_slop
+	c.count = if quick && nearby && c.count < 3 { c.count + 1 } else { 1 }
 	c.last_ms = now_ms
 	c.last_x = x
 	c.last_y = y
