@@ -68,11 +68,13 @@ if mode == 'test' {
 } else if mode == 'smoke' {
 	source = os.join_path(root, 'c', 'tests', 'window_test.c')
 }
-output := os.join_path(build_dir, match mode {
+base_name := match mode {
 	'test' { 'api_test' }
 	'smoke' { 'window_test' }
 	else { 'counter' }
-}) + $if windows { '.exe' } $else { '' }
+}
+suffix := $if windows { '.exe' } $else { '' }
+output := os.join_path(build_dir, base_name) + suffix
 mut compile := [cc, '-std=c99', '-Wall', '-Wextra', '-Werror', '-I', os.join_path(root, 'c'), source,
 	link_library]
 compile << runtime_flags
