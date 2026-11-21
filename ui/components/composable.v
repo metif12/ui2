@@ -112,7 +112,7 @@ pub fn component_variant(base_box BoxStyle, base_text TextStyle, variant Compone
 			base_box.shadow
 		}
 	}
-	text := TextStyle{
+	text_style := TextStyle{
 		color:              if ComponentTextField.color in variant.text_fields || (variant.text.color != 0 && variant.text.color != TextStyle{}.color) {
 			variant.text.color
 		} else {
@@ -204,7 +204,7 @@ pub fn component_variant(base_box BoxStyle, base_text TextStyle, variant Compone
 			base_text.lines
 		}
 	}
-	return box, text
+	return box, text_style
 }
 
 // component_box_shadow_is_set reports whether a BoxShadow carries a visible
