@@ -3542,7 +3542,7 @@ fn ui2_app_did_finish_launching(_self voidptr, _cmd voidptr, _notification voidp
 	// The handle published by run_window is nil on macOS because the window
 	// only exists once the app has finished launching; publish the real
 	// NSWindow now so native_window_handle() reports it to embedders.
-	menu_update_window(st.window)
+	menu_update_window(voidptr(st.window))
 	native_set_content_min_size(st.window, f64(st.run_config.min_width),
 		f64(st.run_config.min_height))
 	// The app delegate doubles as window delegate for windowDidResize:

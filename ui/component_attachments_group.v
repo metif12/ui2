@@ -176,11 +176,11 @@ pub fn attachment_group(config AttachmentGroupConfig) !Element {
 		}
 	}
 	local := component_local(config.frame)
-	content_width, content_height := attachment_group_content_size(config)
+	content_width, group_content_height := attachment_group_content_size(config)
 	// A row always scrolls, so its offset can be read back; wrapped and listed
 	// items scroll only when they overflow, since the custom renderer pads a
 	// vertical scroll's content and would show a scroller for a group that fits.
-	body := if config.layout == .row || content_height > config.frame.height + 0.5 {
+	body := if config.layout == .row || group_content_height > config.frame.height + 0.5 {
 		mode := if config.layout == .row {
 			ScrollMode.horizontal_only
 		} else {
@@ -202,7 +202,7 @@ pub fn attachment_group(config AttachmentGroupConfig) !Element {
 		overflow := content_width - config.frame.width
 		if config.layout == .row && overflow > 1 {
 			fade := math.min(attachment_group_fade, config.frame.width / 4)
-			height := math.min(content_height, config.frame.height)
+			height := math.min(group_content_height, config.frame.height)
 			if config.scroll_offset > 1 {
 				children << view(component_part_id(config.id, 'fade:leading'), rect(0, 0,
 					fade, height), BoxStyle{

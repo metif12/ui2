@@ -10,6 +10,7 @@ const pc_specs_height = 480
 const pc_specs_vml_source = $embed_file('pc_specs.vml').to_string()
 
 // exec_checked runs args and returns the result only when the command succeeds.
+@[markused]
 fn exec_checked(args []string) ?os.Result {
 	res := os.exec(args)
 	if res.exit_code != 0 {

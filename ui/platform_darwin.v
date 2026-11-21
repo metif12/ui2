@@ -63,8 +63,8 @@ fn native_set_app_badge(count int) bool {
 	if tile == unsafe { nil } {
 		return false
 	}
-	label := if count <= 0 { '' } else { count.str() }
-	macos.msg_void1(tile, 'setBadgeLabel:', macos.nsstring(label))
+	badge_label := if count <= 0 { '' } else { count.str() }
+	macos.msg_void1(tile, 'setBadgeLabel:', macos.nsstring(badge_label))
 	return true
 }
 
