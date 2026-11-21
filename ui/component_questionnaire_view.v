@@ -919,20 +919,21 @@ pub fn questionnaire(config QuestionnaireConfig) !Element {
 		stack_height = el.frame.height
 	}
 	scroll_part := questionnaire_scroll_part(config, resolved)
-	children << if stack_height > body_frame.height + 0.5 {
-		Element{
-			...scroll(component_part_id(config.id, scroll_part), body_frame, config.theme.background,
-				[
-					view('', rect(0, 0, width, stack_height), BoxStyle{ transparent: true }, items),
-				])
+	if stack_height > body_frame.height + 0.5 {
+		scroll_base := scroll(component_part_id(config.id, scroll_part), body_frame,
+			config.theme.background,
+			[view('', rect(0, 0, width, stack_height), BoxStyle{ transparent: true }, items)])
+		children << Element{
+			...scroll_base
 			box: BoxStyle{
 				transparent: true
 			}
 			key: scroll_part
 		}
 	} else {
-		Element{
-			...view('', body_frame, BoxStyle{ transparent: true }, items)
+		view_base := view('', body_frame, BoxStyle{ transparent: true }, items)
+		children << Element{
+			...view_base
 			key: 'body'
 		}
 	}

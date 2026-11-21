@@ -544,17 +544,18 @@ fn text(content string, frame ui2.Rect, color u32, size f64, bold bool) ui2.Elem
 
 // surface is a card: the theme background with a border and a soft shadow.
 fn surface(id string, frame ui2.Rect, theme ui2.ComponentTheme, children []ui2.Element) ui2.Element {
+	base := ui2.view(id, frame, ui2.BoxStyle{
+		bg:            theme.background
+		radius:        12
+		border_color:  theme.border
+		border_left:   1
+		border_top:    1
+		border_right:  1
+		border_bottom: 1
+		shadow:        ui2.component_card_shadow()
+	}, children)
 	return ui2.Element{
-		...ui2.view(id, frame, ui2.BoxStyle{
-			bg:            theme.background
-			radius:        12
-			border_color:  theme.border
-			border_left:   1
-			border_top:    1
-			border_right:  1
-			border_bottom: 1
-			shadow:        ui2.component_card_shadow()
-		}, children)
+		...base
 		accessibility_role: 'group'
 	}
 }
@@ -562,9 +563,9 @@ fn surface(id string, frame ui2.Rect, theme ui2.ComponentTheme, children []ui2.E
 fn summary(app &Survey, frame ui2.Rect, theme ui2.ComponentTheme) []ui2.Element {
 	width := frame.width - 2 * card_pad
 	mut children := []ui2.Element{}
+	check := ui2.image('', 'symbol:checkmark.circle.fill', ui2.rect(card_pad, card_pad, 40, 40))
 	children << ui2.Element{
-		...ui2.image('', 'symbol:checkmark.circle.fill', ui2.rect(card_pad, card_pad, 40,
-			40))
+		...check
 		text_style: ui2.TextStyle{
 			color: theme.success
 		}
