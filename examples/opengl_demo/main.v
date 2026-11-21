@@ -3,10 +3,10 @@ import time
 import ui2
 import sokol.gfx
 
-// sokol_gfx.h provides its own GL function declarations on Windows (static
+// sokol_gfx.h provides its own GL function declarations on Windows/macOS (static
 // function pointers loaded from opengl32.dll). Including the system GL headers
 // there would redeclare those symbols as functions and break the C build.
-$if windows {
+$if windows || macos {
 	// GL 1.1 core entry points are exported by opengl32.dll (linked by sokol.c).
 	@[c_extern]
 	fn C.glClearColor(r f32, g f32, b f32, a f32)
