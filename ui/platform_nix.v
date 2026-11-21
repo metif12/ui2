@@ -5,9 +5,8 @@
 // Android theirs, and the default answers for the rest.
 module ui2
 
-import os
-
 $if linux || freebsd || openbsd || netbsd || dragonfly || solaris {
+	import os
 	fn native_haptic_supported() bool {
 		return false
 	}

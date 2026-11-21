@@ -9,7 +9,7 @@ $if (android || linux || freebsd || openbsd || netbsd || dragonfly || solaris ||
 
 	__global embedded_context = []Element{}
 	__global embedded_elements = []Element{}
-	__global embedded_wheel_handler = fn (_ f64, _ f64, _ f64, _ f64) bool { return false }
+	__global embedded_wheel_handler = fn (dx f64, dy f64, sx f64, sy f64) bool { return false }
 	__global embedded_image_paths = map[string]bool{}
 	__global embedded_readonly = map[string]bool{}
 
