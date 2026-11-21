@@ -7,6 +7,9 @@ import sokol.gfx
 // function pointers loaded from opengl32.dll). Including the system GL headers
 // there would redeclare those symbols as functions and break the C build.
 $if windows || macos {
+	$if macos {
+		#flag macos -framework OpenGL
+	}
 	// GL 1.1 core entry points are exported by opengl32.dll (linked by sokol.c).
 	@[c_extern]
 	fn C.glClearColor(r f32, g f32, b f32, a f32)
