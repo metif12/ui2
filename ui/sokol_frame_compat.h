@@ -17,6 +17,9 @@ extern void sapp_wake(void) UI2_SAPP_OPTIONAL;
 #endif
 
 static inline bool ui2_sapp_set_present_on_demand(bool enabled) {
+#ifdef __APPLE__
+    return false; /* V 0.5.2 sokol has no on-demand hooks; weak imports do not link */
+#endif
 #if defined(__unix__) || defined(__APPLE__)
     if (sapp_set_present_on_demand && sapp_request_present &&
         sapp_set_frame_deadline_cb && sapp_wake) {
@@ -27,12 +30,18 @@ static inline bool ui2_sapp_set_present_on_demand(bool enabled) {
 }
 
 static inline void ui2_sapp_request_present(void) {
+#ifdef __APPLE__
+    return;
+#endif
 #if defined(__unix__) || defined(__APPLE__)
     if (sapp_request_present) sapp_request_present();
 #endif
 }
 
 static inline void ui2_sapp_set_frame_deadline_cb(double (*cb)(void)) {
+#ifdef __APPLE__
+    return;
+#endif
 #if defined(__unix__) || defined(__APPLE__)
     /* Install a sleeping loop only when it can also be woken by workers. */
     if (sapp_set_frame_deadline_cb && sapp_wake &&
@@ -43,6 +52,9 @@ static inline void ui2_sapp_set_frame_deadline_cb(double (*cb)(void)) {
 }
 
 static inline void ui2_sapp_wake(void) {
+#ifdef __APPLE__
+    return;
+#endif
 #if defined(__unix__) || defined(__APPLE__)
     if (sapp_wake) sapp_wake();
 #endif

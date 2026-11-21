@@ -37,8 +37,8 @@ $if !ui2_custom_rendering ? {
 			macos.msg_void1(window, 'setTitle:', macos.nsstring(title))
 			macos.msg_void_bool(window, 'setReleasedWhenClosed:', false)
 			// Keep auxiliary windows on the host display, including test placement.
-			screen := macos.msg_id(state().window, 'screen')
-			visible := macos.msg_rect(screen, 'visibleFrame')
+			host_screen := macos.msg_id(state().window, 'host_screen')
+			visible := macos.msg_rect(host_screen, 'visibleFrame')
 			frame := macos.msg_rect(window, 'frame')
 			darwin_msg_void_point(window, 'setFrameOrigin:', darwin_point(visible.x + (visible.width - frame.width) / 2,
 				visible.y + (visible.height - frame.height) / 2))

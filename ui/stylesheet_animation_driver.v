@@ -99,11 +99,11 @@ fn walk_style_animations(current Element, ancestor_sheets []Stylesheet, now i64,
 	if current.id.len > 0 {
 		seen[current.id] = true
 		mut runtime := animation_runtime()
-		mut state := runtime.style_runs[current.id] or { StyleElementAnimations{} }
+		mut anim_state := runtime.style_runs[current.id] or { StyleElementAnimations{} }
 		mut covered := map[string]bool{}
 		if old_el := g_style_prev_elements[current.id] {
 			displayed, _ := apply_style_animation_node(old_el, now)
-			state = runtime.style_runs[current.id] or { state }
+			anim_state = runtime.style_runs[current.id] or { anim_state }
 			for spec in current.style_transitions {
 				props := if spec.properties.len == 0 || spec.properties == ['all'] {
 					all_animatable_properties()
@@ -115,10 +115,10 @@ fn walk_style_animations(current Element, ancestor_sheets []Stylesheet, now i64,
 				}
 				for target in changed_transition_targets(old_el, current, spec) {
 					if spec.duration <= 0 {
-						state.transitions.delete(target.name)
+						anim_state.transitions.delete(target.name)
 						continue
 					}
-					state.transitions[target.name] = StyleTransitionRun{
+					anim_state.transitions[target.name] = StyleTransitionRun{
 						start:      style_property_value(displayed, target.name)
 						target:     target
 						spec:       spec
@@ -128,9 +128,9 @@ fn walk_style_animations(current Element, ancestor_sheets []Stylesheet, now i64,
 				}
 			}
 		}
-		for name, _ in state.transitions {
+		for name, _ in anim_state.transitions {
 			if name !in covered {
-				state.transitions.delete(name)
+				anim_state.transitions.delete(name)
 				changed = true
 			}
 		}
@@ -365,13 +365,13 @@ fn style_apply_property_pair(el Element, from AnimationProperty, to AnimationPro
 // Called under the animation runtime mutex, alongside the imperative pass.
 fn apply_style_animation_node(declared Element, now i64) (Element, bool) {
 	mut runtime := animation_runtime()
-	mut state := runtime.style_runs[declared.id] or { return declared, false }
+	mut anim_state := runtime.style_runs[declared.id] or { return declared, false }
 	mut out := declared
-	for i in 0 .. state.animations.len {
-		mut kf_run := state.animations[i]
+	for i in 0 .. anim_state.animations.len {
+		mut kf_run := anim_state.animations[i]
 		position, contributes, finished := style_keyframe_position(kf_run, now)
 		kf_run.finished = finished
-		state.animations[i] = kf_run
+		anim_state.animations[i] = kf_run
 		if !contributes { continue }
 		for track in kf_run.tracks {
 			for stop in 1 .. track.stops.len {
@@ -386,24 +386,24 @@ fn apply_style_animation_node(declared Element, now i64) (Element, bool) {
 		}
 	}
 	// CSS transitions have precedence over keyframe animation values.
-	for name, run in state.transitions {
+	for name, run in anim_state.transitions {
 		elapsed := f64(now - run.started_at) / 1000.0 - run.spec.delay
 		if elapsed >= run.spec.duration {
-			state.transitions.delete(name)
+			anim_state.transitions.delete(name)
 			continue
 		}
 		progress := unit_clamp(elapsed / run.spec.duration)
 		eased := apply_animation_transition(Animation{ transition: run.spec.timing, transition_fn: run.spec.timing_fn }, progress)
 		out = style_apply_property_pair(out, run.start, run.target, eased)
 	}
-	runtime.style_runs[declared.id] = state
+	runtime.style_runs[declared.id] = anim_state
 	return out, true
 }
 
 fn style_animation_needs_frame(id string) bool {
 	runtime := animation_runtime()
-	state := runtime.style_runs[id] or { return false }
-	return state.transitions.len > 0 || state.animations.any(!it.paused && !it.finished)
+	anim_state := runtime.style_runs[id] or { return false }
+	return anim_state.transitions.len > 0 || anim_state.animations.any(!it.paused && !it.finished)
 }
 
 fn style_animations_need_frames(now i64) bool {
