@@ -8,10 +8,12 @@ fn C.ui2_example_configure_custom_window(width int, height int) bool
 
 fn C.ui2_example_drag_custom_window()
 
+@[markused]
 fn windows_configure_custom_window(width int, height int) bool {
 	return C.ui2_example_configure_custom_window(width, height)
 }
 
+@[markused]
 fn windows_drag_custom_window() {
 	C.ui2_example_drag_custom_window()
 }

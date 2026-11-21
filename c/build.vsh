@@ -62,12 +62,11 @@ $if windows {
 } $else {
 	runtime_flags << '-Wl,-rpath,${build_dir}'
 }
-source := if mode == 'test' {
-	os.join_path(root, 'c', 'tests', 'api_test.c')
+mut source := os.join_path(root, 'examples', 'counter_c', 'main.c')
+if mode == 'test' {
+	source = os.join_path(root, 'c', 'tests', 'api_test.c')
 } else if mode == 'smoke' {
-	os.join_path(root, 'c', 'tests', 'window_test.c')
-} else {
-	os.join_path(root, 'examples', 'counter_c', 'main.c')
+	source = os.join_path(root, 'c', 'tests', 'window_test.c')
 }
 output := os.join_path(build_dir, match mode {
 	'test' { 'api_test' }
