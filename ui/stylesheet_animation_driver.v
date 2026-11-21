@@ -142,7 +142,7 @@ fn walk_style_animations(current Element, ancestor_sheets []Stylesheet, now i64,
 				continue
 			}
 			mut found := false
-			for previous_index, previous in state.animations {
+			for previous_index, previous in anim_state.animations {
 				if previous_index in used || previous.name != spec.name { continue }
 				used[previous_index] = true
 				mut kf_run := StyleKeyframeRun{ ...previous, slot: slot }
@@ -181,10 +181,10 @@ fn walk_style_animations(current Element, ancestor_sheets []Stylesheet, now i64,
 				changed = true
 			}
 		}
-		if next.len != state.animations.len { changed = true }
-		state.animations = next
-		if state.animations.len > 0 || state.transitions.len > 0 {
-			runtime.style_runs[current.id] = state
+		if next.len != anim_state.animations.len { changed = true }
+		anim_state.animations = next
+		if anim_state.animations.len > 0 || anim_state.transitions.len > 0 {
+			runtime.style_runs[current.id] = anim_state
 		} else {
 			runtime.style_runs.delete(current.id)
 		}
@@ -408,13 +408,13 @@ fn style_animation_needs_frame(id string) bool {
 
 fn style_animations_need_frames(now i64) bool {
 	runtime := animation_runtime()
-	for _, state in runtime.style_runs {
-		for _, run in state.transitions {
+	for _, anim_state in runtime.style_runs {
+		for _, run in anim_state.transitions {
 			if f64(now - run.started_at) <= (run.spec.duration + run.spec.delay) * 1000 + 34 {
 				return true
 			}
 		}
-		for run in state.animations {
+		for run in anim_state.animations {
 			if run.paused || run.finished { continue }
 			if run.spec.infinite || f64(now - run.started_at) <= (run.spec.duration * run.spec.iteration_count + run.spec.delay) * 1000 + 34 {
 				return true
