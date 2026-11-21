@@ -7,10 +7,9 @@
 // iOS have their own bridge files, and Android the default fallback.
 module ui2
 
-import time
-
 $if linux || freebsd || openbsd || netbsd || dragonfly || solaris {
 	import os
+	import time
 
 	struct LinuxClipboardTool {
 		copy  []string // arguments of the tool reading the text from its stdin
