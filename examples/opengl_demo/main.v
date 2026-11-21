@@ -3,10 +3,24 @@ import time
 import ui2
 import sokol.gfx
 
-#flag -lGL
-#flag -DGL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
+// sokol_gfx.h provides its own GL function declarations on Windows (static
+// function pointers loaded from opengl32.dll). Including the system GL headers
+// there would redeclare those symbols as functions and break the C build.
+$if windows {
+	// GL 1.1 core entry points are exported by opengl32.dll (linked by sokol.c).
+	@[c_extern]
+	fn C.glClearColor(r f32, g f32, b f32, a f32)
+	@[c_extern]
+	fn C.glClear(mask u32)
+} $else {
+	#flag -lGL
+	#flag -DGL_GLEXT_PROTOTYPES
+	#include <GL/gl.h>
+	#include <GL/glext.h>
+
+	fn C.glClearColor(r f32, g f32, b f32, a f32)
+	fn C.glClear(mask u32)
+}
 
 const gl_color_buffer_bit = 0x00004000
 const gl_texture_2d = 0x0de1
@@ -28,8 +42,6 @@ fn C.glGenFramebuffers(n i32, framebuffers &u32)
 fn C.glDeleteFramebuffers(n i32, framebuffers &u32)
 fn C.glBindFramebuffer(target u32, framebuffer u32)
 fn C.glFramebufferTexture2D(target u32, attachment u32, textarget u32, texture u32, level i32)
-fn C.glClearColor(r f32, g f32, b f32, a f32)
-fn C.glClear(mask u32)
 
 // Surface is a GL texture of the element's size in pixels, with a framebuffer on it.
 struct Surface {
@@ -76,8 +88,8 @@ fn (mut s Surface) draw(id string, frame ui2.Rect, scale f64, _ f64) {
 	s.resize(w, h)
 	t := f64(time.ticks()) / 1000.0
 	C.glBindFramebuffer(gl_framebuffer, s.fbo)
-	C.glClearColor(f32(0.5 + 0.5 * math.sin(t)), f32(0.5 + 0.5 * math.sin(t + 2.1)),
-		f32(0.5 + 0.5 * math.sin(t + 4.2)), 1)
+	C.glClearColor(f32(0.5 + 0.5 * math.sin(t)), f32(0.5 + 0.5 * math.sin(t + 2.1)), f32(0.5 +
+		0.5 * math.sin(t + 4.2)), 1)
 	C.glClear(gl_color_buffer_bit)
 	C.glBindFramebuffer(gl_framebuffer, 0)
 	ui2.set_gl_surface_texture(id, s.tex, w, h)
@@ -107,9 +119,9 @@ fn main() {
 		ui2.run_window('OpenGL Surface', 400, 500, build, fn (_ string) {})
 	} $else {
 		ui2.run_window_with_options(ui2.WindowOptions{
-			title: 'OpenGL Surface'
-			width: 400
-			height: 500
+			title:   'OpenGL Surface'
+			width:   400
+			height:  500
 			refresh: .continuous
 		}, build, fn (_ string) {})
 	}
