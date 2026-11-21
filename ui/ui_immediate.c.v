@@ -1324,6 +1324,13 @@ $if (android || linux || freebsd || openbsd || netbsd || dragonfly || solaris ||
 	}
 
 	fn on_init(app &GgApp) {
+		// Newer gg no longer sets sokol-gl up itself; its pure-V renderer replaced
+		// the sgl draws. ui2's immediate backend still draws through sgl, so set
+		// it up here, once, before any frame can reach a draw call. Without this
+		// the first sgl call runs against an uninitialized context: assertions
+		// abort in debug builds, and release builds fault on the null state.
+		// See im_draw_setup in immediate_draw.c.v.
+		im_draw_setup()
 		// Sokol's loops swap even when frame_fn returns early, so an undrawn backbuffer
 		// can be presented on drivers that discard it. Metal skips idle callbacks.
 		// NOTE(V 0.5.2 CI): present-on-demand (see set_refresh_mode) is disabled

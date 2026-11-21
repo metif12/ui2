@@ -13,10 +13,10 @@ $if (android || linux || freebsd || openbsd || netbsd || dragonfly || solaris ||
 	__global im_draw_ready = false
 	__global im_alpha_pipe = sgl.Pipeline{}
 
-	// im_draw_setup prepares sokol-gl for the immediate backend. Newer gg
-	// drives its own pure-V renderer and no longer sets sgl up; 0.5.2-era gg
-	// did it internally during context creation. Called once from on_init, so
-	// it runs a single time on either toolchain.
+	// im_draw_setup prepares sokol-gl for the immediate backend. gg's pure-V
+	// renderer no longer sets sgl up, so ui2 must do it explicitly. Called once
+	// from on_init, after Sokol's setup and before the first frame, so every
+	// toolchain runs it exactly once.
 	fn im_draw_setup() {
 		if im_draw_ready {
 			return
