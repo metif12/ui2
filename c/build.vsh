@@ -30,13 +30,12 @@ cc := os.getenv_opt('CC') or {
 }
 library_name := $if macos { 'libui2.dylib' } $else $if windows { 'ui2.dll' } $else { 'libui2.so' }
 library := os.join_path(build_dir, library_name)
-module_path := os.dir(root) + '|@vlib|@vmodules'
 mut command := [@VEXE, '-enable-globals', '-cc', cc, '-gc', 'boehm', '-shared']
 command << args#[2..]
 $if linux {
 	command << ['-cflags', '-Wl,-soname,libui2.so']
 }
-command << ['-path', module_path, '-o', library, os.join_path(root, 'c')]
+command << ['-o', library, os.join_path(root, 'c')]
 checked_execute(command)
 $if macos {
 	// Some V versions give shared libraries the install name "out". Use a
