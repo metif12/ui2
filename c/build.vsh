@@ -62,18 +62,19 @@ $if windows {
 } $else {
 	runtime_flags << '-Wl,-rpath,${build_dir}'
 }
-source := if mode == 'test' {
-	os.join_path(root, 'c', 'tests', 'api_test.c')
+mut source := os.join_path(root, 'examples', 'counter_c', 'main.c')
+if mode == 'test' {
+	source = os.join_path(root, 'c', 'tests', 'api_test.c')
 } else if mode == 'smoke' {
-	os.join_path(root, 'c', 'tests', 'window_test.c')
-} else {
-	os.join_path(root, 'examples', 'counter_c', 'main.c')
+	source = os.join_path(root, 'c', 'tests', 'window_test.c')
 }
-output := os.join_path(build_dir, match mode {
+base_name := match mode {
 	'test' { 'api_test' }
 	'smoke' { 'window_test' }
 	else { 'counter' }
-}) + $if windows { '.exe' } $else { '' }
+}
+suffix := $if windows { '.exe' } $else { '' }
+output := os.join_path(build_dir, base_name) + suffix
 mut compile := [cc, '-std=c99', '-Wall', '-Wextra', '-Werror', '-I', os.join_path(root, 'c'), source,
 	link_library]
 compile << runtime_flags

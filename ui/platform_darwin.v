@@ -85,7 +85,7 @@ fn native_open_url(url string) bool {
 	if target == unsafe { nil } {
 		return false
 	}
-	return macos.msg_bool_id(workspace, 'openURL:', target)
+	return darwin_msg_bool_id(workspace, 'openURL:', target)
 }
 
 // The share sheet picker anchors to a view the shared layer does not own, so
