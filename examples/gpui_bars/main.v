@@ -101,54 +101,36 @@ fn (mut app Demo) set_menu(id string, value ui2.DropdownMenuState) {
 	}
 }
 
+// dd_item builds a dropdown row. Keeping the struct-update expression in this
+// small helper (one per function) avoids the V 0.5.2 codegen bug that scrambles
+// generated C when many of them appear together in a single function. The
+// empty icon/shortcut defaults match what dropdown_menu_item() sets.
+fn dd_item(id string, label string, icon string, shortcut string) ui2.DropdownMenuItem {
+	return ui2.DropdownMenuItem{
+		...ui2.dropdown_menu_item(id, label)
+		icon:     icon
+		shortcut: shortcut
+	}
+}
+
 fn menu_items(app &Demo, id string) []ui2.DropdownMenuItem {
 	return match id {
 		'menu-file' {
 			[
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('new', 'New')
-					icon:     'doc.badge.plus'
-					shortcut: 'cmd+n'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('open', 'Open…')
-					icon:     'folder'
-					shortcut: 'cmd+o'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('save', 'Save')
-					icon:     'square.and.arrow.down'
-					shortcut: 'cmd+s'
-				},
+				dd_item('new', 'New', 'doc.badge.plus', 'cmd+n'),
+				dd_item('open', 'Open…', 'folder', 'cmd+o'),
+				dd_item('save', 'Save', 'square.and.arrow.down', 'cmd+s'),
 				ui2.dropdown_menu_separator(),
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('quit', 'Quit')
-					icon:     'power'
-					shortcut: 'cmd+q'
-				},
+				dd_item('quit', 'Quit', 'power', 'cmd+q'),
 			]
 		}
 		'menu-edit' {
 			[
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('undo', 'Undo')
-					shortcut: 'cmd+z'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('redo', 'Redo')
-					shortcut: 'cmd+shift+z'
-				},
+				dd_item('undo', 'Undo', '', 'cmd+z'),
+				dd_item('redo', 'Redo', '', 'cmd+shift+z'),
 				ui2.dropdown_menu_separator(),
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('cut', 'Cut')
-					icon:     'scissors'
-					shortcut: 'cmd+x'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('copy', 'Copy')
-					icon:     'doc.on.doc'
-					shortcut: 'cmd+c'
-				},
+				dd_item('cut', 'Cut', 'scissors', 'cmd+x'),
+				dd_item('copy', 'Copy', 'doc.on.doc', 'cmd+c'),
 			]
 		}
 		'menu-view' {
@@ -162,37 +144,17 @@ fn menu_items(app &Demo, id string) []ui2.DropdownMenuItem {
 		}
 		'menu-insert' {
 			[
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('image', 'Image…')
-					icon: 'photo'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('table', 'Table')
-					icon: 'tablecells'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('link', 'Link')
-					icon:     'link'
-					shortcut: 'cmd+k'
-				},
+				dd_item('image', 'Image…', 'photo', ''),
+				dd_item('table', 'Table', 'tablecells', ''),
+				dd_item('link', 'Link', 'link', 'cmd+k'),
 			]
 		}
 		else {
 			[
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('export', 'Export as PDF')
-					icon: 'doc.badge.arrow.up'
-				},
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('print', 'Print…')
-					icon:     'printer'
-					shortcut: 'cmd+p'
-				},
+				dd_item('export', 'Export as PDF', 'doc.badge.arrow.up', ''),
+				dd_item('print', 'Print…', 'printer', 'cmd+p'),
 				ui2.dropdown_menu_separator(),
-				ui2.DropdownMenuItem{
-					...ui2.dropdown_menu_item('info', 'Document info')
-					icon: 'info.circle'
-				},
+				dd_item('info', 'Document info', 'info.circle', ''),
 			]
 		}
 	}
