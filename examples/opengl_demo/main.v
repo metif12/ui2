@@ -33,15 +33,37 @@ const gl_unsigned_byte = 0x1401
 const gl_framebuffer = 0x8d40
 const gl_color_attachment0 = 0x8ce0
 
-fn C.glGenTextures(n i32, textures &u32)
-fn C.glDeleteTextures(n i32, textures &u32)
-fn C.glBindTexture(target u32, texture u32)
-fn C.glTexImage2D(target u32, level i32, internal_format i32, width i32, height i32, border i32, format u32, typ u32, pixels voidptr)
-fn C.glTexParameteri(target u32, pname u32, param i32)
-fn C.glGenFramebuffers(n i32, framebuffers &u32)
-fn C.glDeleteFramebuffers(n i32, framebuffers &u32)
-fn C.glBindFramebuffer(target u32, framebuffer u32)
-fn C.glFramebufferTexture2D(target u32, attachment u32, textarget u32, texture u32, level i32)
+$if macos {
+	// macOS sokol does not declare these entry points; emit real externs.
+	@[c_extern]
+	fn C.glGenTextures(n i32, textures &u32)
+	@[c_extern]
+	fn C.glDeleteTextures(n i32, textures &u32)
+	@[c_extern]
+	fn C.glBindTexture(target u32, texture u32)
+	@[c_extern]
+	fn C.glTexImage2D(target u32, level i32, internal_format i32, width i32, height i32, border i32, format u32, typ u32, pixels voidptr)
+	@[c_extern]
+	fn C.glTexParameteri(target u32, pname u32, param i32)
+	@[c_extern]
+	fn C.glGenFramebuffers(n i32, framebuffers &u32)
+	@[c_extern]
+	fn C.glDeleteFramebuffers(n i32, framebuffers &u32)
+	@[c_extern]
+	fn C.glBindFramebuffer(target u32, framebuffer u32)
+	@[c_extern]
+	fn C.glFramebufferTexture2D(target u32, attachment u32, textarget u32, texture u32, level i32)
+} $else {
+	fn C.glGenTextures(n i32, textures &u32)
+	fn C.glDeleteTextures(n i32, textures &u32)
+	fn C.glBindTexture(target u32, texture u32)
+	fn C.glTexImage2D(target u32, level i32, internal_format i32, width i32, height i32, border i32, format u32, typ u32, pixels voidptr)
+	fn C.glTexParameteri(target u32, pname u32, param i32)
+	fn C.glGenFramebuffers(n i32, framebuffers &u32)
+	fn C.glDeleteFramebuffers(n i32, framebuffers &u32)
+	fn C.glBindFramebuffer(target u32, framebuffer u32)
+	fn C.glFramebufferTexture2D(target u32, attachment u32, textarget u32, texture u32, level i32)
+}
 
 // Surface is a GL texture of the element's size in pixels, with a framebuffer on it.
 struct Surface {
