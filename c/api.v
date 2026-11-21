@@ -299,26 +299,26 @@ pub fn create(kind int, id &char, x f64, y f64, width f64, height f64) &C.ui2_no
 @[export: 'ui2_add']
 pub fn add(parent &C.ui2_node, child &C.ui2_node) {
 	mut p := unsafe { node(parent) or { return } }
-	mut c := unsafe { node(child) or { return } }
+	mut child_node := unsafe { node(child) or { return } }
 	if p.element.kind !in [.screen, .view, .scroll] {
 		fail('only screens, views and scrolls can have children')
 		return
 	}
-	if c.parent != unsafe { nil } || c.element.kind == .screen {
+	if child_node.parent != unsafe { nil } || child_node.element.kind == .screen {
 		fail('a widget may have only one parent and screens must be roots')
 		return
 	}
 	mut ancestor := p
 	for {
-		if ancestor == c {
+		if ancestor == child_node {
 			fail('widget tree contains a cycle')
 			return
 		}
 		if ancestor.parent == unsafe { nil } { break }
 		ancestor = unsafe { &Node(ancestor.parent) }
 	}
-	c.parent = voidptr(p)
-	p.children << c
+	child_node.parent = voidptr(p)
+	p.children << child_node
 }
 
 @[export: 'ui2_set_text']
