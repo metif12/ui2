@@ -6,7 +6,7 @@ module ui2
 
 import os
 
-#flag darwin -framework AVFoundation -framework QuartzCore -framework Cocoa
+#flag darwin -framework AVFoundation -framework QuartzCore -framework Cocoa -framework CoreMedia
 #flag darwin -fno-objc-arc
 #include "@VMODROOT/ui/media_apple.h"
 #include "@VMODROOT/ui/media_apple.m"
