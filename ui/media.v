@@ -767,8 +767,8 @@ pub fn media_controls(config MediaControlsConfig) !Element {
 	component_validate_id(config.id)!
 	position := media_position(config.id)
 	duration := media_duration(config.id)
-	state := media_state(config.id)
-	playing := state == .playing
+	media_status := media_state(config.id)
+	playing := media_status == .playing
 	session_muted := if session := media_session(config.id) {
 		session.muted
 	} else {

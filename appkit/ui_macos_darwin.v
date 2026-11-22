@@ -1329,7 +1329,7 @@ fn render_element(parent NativeView, source Element, key string, mut active map[
 			render_children(native, el.children, key, mut active)
 		}
 		.media {
-			media_sync_native(native, el, el.frame)
+			media_sync_native(voidptr(native), el, el.frame)
 		}
 		.scroll {
 			// Observe scroll position changes for virtualized lists
